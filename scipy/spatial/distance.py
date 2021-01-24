@@ -2062,11 +2062,22 @@ def pdist(X, metric='euclidean', *args, **kwargs):
             X, typ, kwargs = _validate_pdist_input(X, m, n,
                                                    metric_name, **kwargs)
 
+        T = 0.3
         k = 0
-        for i in range(0, m - 1):
-            for j in range(i + 1, m):
-                dm[k] = metric(X[i], X[j], **kwargs)
+        for i in xrange(0, m - 1):
+            fi_ = X[i]
+            for j in xrange(i + 1, m):
+                fj = X[j]
+                sij = np.multiply(fi_, fj)
+                fi = [fi_[x] for x, y in enumerate(sij) if y > T]
+                fj = [fj[x] for x, y in enumerate(sij) if y > T]
+                fi = np.array(fi)
+                fj = np.array(fj)
+                print(fi.shape, fj.shape)
+                #print('fi: ', len(fi))
+                dm[k] = metric(fi, fj, **kwargs)
                 k = k + 1
+                if k % 100 == 0: print('finished ', k)
 
     elif isinstance(metric, str):
         mstr = metric.lower()
